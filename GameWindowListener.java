@@ -5,22 +5,43 @@ public class GameWindowListener implements MouseListener{
     Board gameBoard;
     Panel panel;
     int turnNumber = 1;
+    boolean isPlayerOne = true;
+    AI ai;
 
-    public GameWindowListener(Board gameBoard, Panel panel) {
+    public GameWindowListener(Board gameBoard, Panel panel, AI ai) {
         this.gameBoard = gameBoard;
         this.panel = panel;
+        this.ai = ai;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int columnNumber = (e.getX() / 71);
         boolean validMove = false;
+        if (!isPlayerOne) {
+            validMove = ai.makeMove();
+            while (!validMove) {
+                validMove = ai.makeMove();
+            }
+            checkValidMove(validMove);
+        }
+        int columnNumber = (e.getX() / 71);
         if (turnNumber % 2 == 0) {
             validMove = gameBoard.makeMove(columnNumber, (byte) 0b10);
         } else {
             validMove = gameBoard.makeMove(columnNumber, (byte) 0b01);
         }
-        if (validMove) {
+        checkValidMove(validMove);
+        if (isPlayerOne) {
+            validMove = ai.makeMove();
+            while (!validMove) {
+                validMove = ai.makeMove();
+            }
+            checkValidMove(validMove);
+        }
+    }
+
+    public void checkValidMove(boolean isValidMove) {
+        if (isValidMove) {
             panel.setBoard(gameBoard);
             panel.repaint();
             byte winnerID = gameBoard.checkIfPlayerWon();

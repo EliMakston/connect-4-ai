@@ -1,13 +1,13 @@
 public class Board {
     Piece[][] currentPosition;
-    boolean isPlayerOneTurn;
-    boolean isGameOver;
 
     Board() {
         currentPosition = new Piece[7][6];
-        isGameOver = false;
-        isPlayerOneTurn = true;
         generateBlankBoard();
+    }
+
+    Board(Piece[][] currentPosition) {
+        this.currentPosition = currentPosition;
     }
 
     private void generateBlankBoard() {
@@ -35,6 +35,10 @@ public class Board {
             }
             System.out.print("\n");
         }
+    }
+
+    public Board copy() {
+        return new Board(this.currentPosition);
     }
 
     public byte checkIfPlayerWon() {
@@ -75,5 +79,25 @@ public class Board {
             i++;
         }
         return 0b00;
+    }
+
+    public Board[] getAllPossibleMoves(byte playerID) {
+        int possibleMoveNumber = 0;
+        for (int i = 0; i < currentPosition.length; i++) {
+            if (currentPosition[i][5].ID == 0b00) {
+                possibleMoveNumber++;
+            }
+        }
+        Board[] possibleMoves = new Board[possibleMoveNumber];
+        int boardIndex = 0;
+        for (int i = 0; i < currentPosition.length; i++) {
+            if (currentPosition[i][5].ID == 0b00) {
+                Board newMove = this.copy();
+                newMove.makeMove(i, playerID);
+                possibleMoves[boardIndex] = newMove;
+                boardIndex++;
+            }
+        }
+        return possibleMoves;
     }
 }
